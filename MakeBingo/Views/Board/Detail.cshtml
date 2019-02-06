@@ -1,4 +1,9 @@
 ﻿@model Board
+@section Headers {
+    <meta property="og:title" content="@Model.Title - 나만의 빙고" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://bingo.variel.kr/board/detail/@Model.Id" />
+}
 <div class="container" style="max-width: 750px;">
     <h2 class="text-center mt-5">@Model.Title</h2>
     <p class="text-right mb-0">

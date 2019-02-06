@@ -1,4 +1,10 @@
 ﻿@model Result
+@section Headers {
+    <meta property="og:title" content="@Model.Board.Title - 나만의 빙고"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://bingo.variel.kr/result/detail/@Model.Id"/>
+    <meta property="og:image" content="https://mybingo.blob.core.windows.net/images/@(Model.Id).png"/>
+}
 <div id="bingo" class="container" style="max-width: 750px;">
     <h2 class="text-center mt-5">
         <a href="@Url.Action("Detail", "Board", new {Model.Board.Id})">@Model.Board.Title</a>
