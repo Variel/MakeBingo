@@ -94,8 +94,10 @@ body {
 .bingo-cell {
     position: relative;
     display: flex;
+    text-align: center;
     width: 20%;
     height: 100%;
+    padding: 5px;
     justify-content: center;
     align-items: center;
     border-left: 1px solid #d0d0d0;
