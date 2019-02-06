@@ -1,0 +1,48 @@
+﻿@model Board
+<div class="container" style="max-width: 750px;">
+    <h2 class="text-center mt-5">@Model.Title</h2>
+    <p class="text-right mb-0">
+        @if (!String.IsNullOrWhiteSpace(Model.Maker))
+        {
+            if (!String.IsNullOrWhiteSpace(Model.Link))
+            {
+                <text>만든이 : <a href="@Model.Link" target="_blank">@Model.Maker</a></text>
+            }
+            else
+            {
+                <text>만든이 : @Model.Maker</text>
+            }
+        }
+    </p>
+    <p class="text-right">
+        @if (Model.Parent != null)
+        {
+            <text>원본 : <a href="@Url.Action("Detail", "Board", new {id = Model.ParentId})">@Model.Parent.Title - @Model.Parent.Maker</a></text>
+        }
+    </p>
+
+    <div class="square-wrap mt-3">
+        <div class="content">
+            <div class="bingo-board">
+                @foreach (var row in Model.Cells)
+                {
+                    <div class="bingo-row">
+                        @foreach (var cell in row)
+                        {
+                            <div class="bingo-cell">
+                                @cell.Label
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="@Url.Action("Play", "Board", new {id = Model.Id})" class="btn btn-primary btn-lg text-white px-5 py-3"><i class="fa fa-play"></i> 빙고 시작</a>
+    </div>
+    <div class="text-center mt-3">
+        <a href="@Url.Action("Create", "Board", new {parentId = Model.Id})" class="btn btn-secondary"><i class="fa fa-copy"></i> 빙고판 복제</a>
+    </div>
+</div>

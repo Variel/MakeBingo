@@ -1,0 +1,89 @@
+﻿@model Board
+<div id="bingo" class="container" style="max-width: 750px;">
+    <h2 class="text-center mt-5">@Model.Title</h2>
+    <p class="text-right mb-0">
+        @if (!String.IsNullOrWhiteSpace(Model.Maker))
+        {
+            if (!String.IsNullOrWhiteSpace(Model.Link))
+            {
+                <text>만든이 : <a href="@Model.Link" target="_blank">@Model.Maker</a></text>
+            }
+            else
+            {
+                <text>만든이 : @Model.Maker</text>
+            }
+        }
+    </p>
+    <p class="text-right">
+        @if (Model.Parent != null)
+        {
+            <text>원본 : <a href="@Url.Action("Detail", "Board", new {id = Model.ParentId})">@Model.Parent.Title - @Model.Parent.Maker</a></text>
+        }
+    </p>
+
+    <div class="square-wrap mt-3">
+        <div class="content">
+            <div class="bingo-board">
+                <div class="bingo-row" v-for="row in cells">
+                    <div class="bingo-cell" v-for="cell in row" @@click="cell.checked = !cell.checked; cell.pattern = Math.floor(Math.random() * 6 + 1);">
+                        <div class="bingo-overlay" v-show="cell.checked" v-bind:class="[ 'crayon' + cell.pattern ]"></div>
+                        {{ cell.label }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center my-5">
+        <button class="btn btn-primary btn-lg text-white px-5 py-3" @@click="save"><i class="fa fa-save"></i> 저장</button>
+        <a href="@Url.Action("Play", "Board", new {id = Model.Id})" class="btn btn-secondary btn-lg text-white px-4 py-3"><i class="fa fa-share"></i> 빙고판 공유</a>
+    </div>
+</div>
+
+@section Scripts{ 
+    <script>
+        var bingo = new Vue({
+            el: '#bingo',
+            data: {
+                cells: [
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}]
+                ],
+                boardId: '@Html.Raw(Model.Id)'
+            },
+            methods: {
+                save: function() {
+                    fetch('/api/boards/' + this.boardId + '/results',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    cells: this.cells
+                                })
+                            })
+                        .then(function(res) { return res.json() })
+                        .then(function(data) {
+                            if (data && data.id) {
+                                location.href = '/result/image/' + data.id;
+                            } else {
+                                alert('저장 중 오류가 발생했습니다');
+                            }
+                        });
+                }
+            },
+            mounted: function() {
+                var _this = this;
+                window.fetch('/api/boards/' + this.boardId)
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        _this.cells = data.cells;
+                    });
+            }
+        });
+    </script>
+}

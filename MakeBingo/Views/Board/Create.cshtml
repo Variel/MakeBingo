@@ -1,0 +1,120 @@
+﻿<div id="create-editor" class="container" style="max-width: 750px;">
+    <div class="row mt-5">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>빙고판 이름</label>
+                <input type="text" class="form-control" v-model="title"/>
+            </div>
+            <div class="form-group">
+                <label>빙고판 만든이</label>
+                <input type="text" class="form-control" v-model="maker"/>
+            </div>
+            <div class="form-group">
+                <label>만든이 SNS링크</label>
+                <input type="text" class="form-control" v-model="link"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="square-wrap mt-3">
+        <div class="content">
+            <div class="bingo-board">
+                <div class="bingo-row" v-for="row in cells">
+                    <div class="bingo-cell" v-for="cell in row">
+                        <textarea v-model="cell.label" placeholder="항목을 채워주세요"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-right mt-3">
+        <button class="btn btn-success" @@click="submit">저장</button>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        var editor = new Vue({
+            el: '#create-editor',
+            data: {
+                title: '',
+                cells: [
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}],
+                    [{}, {}, {}, {}, {}]
+                ],
+                maker: '',
+                link: '',
+                parentId: null,
+            },
+            methods: {
+                setParent: function (parentId) {
+                    var _this = this;
+                    window.fetch('/api/boards/' + parentId)
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            _this.parentId = parentId;
+                            _this.cells = data.cells;
+                            _this.title = data.title;
+                        });
+                },
+                submit: function () {
+                    var hasBlank = false;
+
+                    for (var i = 0; i < 5; i++) {
+                        for (var j = 0; j < 5; j++) {
+                            if (!this.cells[i][j].label
+                                || this.cells[i][j].label.replace(/\s/g, '').length === 0) {
+                                hasBlank = true;
+                                break;
+                            }
+                        }
+                        if (hasBlank)
+                            break;
+                    }
+
+                    if (hasBlank) {
+                        alert('모든 항목을 다 채워주세요');
+                        return;
+                    }
+
+                    window.fetch('/api/boards/',
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    title: this.title,
+                                    cells: this.cells,
+                                    maker: this.maker,
+                                    link: this.link,
+                                    parentId: this.parentId
+                                }),
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            if (data && data.id) {
+                                location.href = '/board/detail/' + data.id;
+                            } else {
+                                alert('저장에 실패했습니다');
+                            }
+                        });
+                }
+            },
+            mounted: function () {
+            }
+        })
+    </script>
+    
+    @if (ViewBag.ParentId != null)
+    {
+        <script>
+            editor.setParent('@ViewBag.ParentId');
+        </script>
+    }
+}

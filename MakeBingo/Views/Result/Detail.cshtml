@@ -1,0 +1,65 @@
+﻿@model Result
+<div id="bingo" class="container" style="max-width: 750px;">
+    <h2 class="text-center mt-5">
+        <a href="@Url.Action("Detail", "Board", new {Model.Board.Id})">@Model.Board.Title</a>
+    </h2>
+    <p class="text-right mb-0">
+        @if (!String.IsNullOrWhiteSpace(Model.Board.Maker))
+        {
+            if (!String.IsNullOrWhiteSpace(Model.Board.Link))
+            {
+                <text>만든이 : <a href="@Model.Board.Link" target="_blank">@Model.Board.Maker</a></text>
+            }
+            else
+            {
+                <text>만든이 : @Model.Board.Maker</text>
+            }
+        }
+    </p>
+    <p class="text-right">
+        @if (Model.Board.Parent != null)
+        {
+            <text>원본 : <a href="@Url.Action("Detail", "Board", new {id = Model.Board.ParentId})">@Model.Board.Parent.Title - @Model.Board.Parent.Maker</a></text>
+        }
+    </p>
+
+    <div class="square-wrap mt-3">
+        <div class="content">
+            <div class="bingo-board">
+                @foreach (var row in Model.Cells)
+                {
+                    <div class="bingo-row">
+                        @foreach (var cell in row)
+                        {
+                            <div class="bingo-cell">
+                                @if (cell.Checked)
+                                {
+                                    <div class="bingo-overlay crayon@(cell.Pattern)"></div>
+                                }
+                                @cell.Label
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center my-5">
+        <div class="dropdown d-inline-block my-2">
+            <button class="btn btn-lg btn-primary px-5 py-3 dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-share"></i> 결과 공유
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://bingo.variel.kr"><i class="fab fa-facebook mr-1"></i> 페이스북</a>
+                <a class="dropdown-item" target="_blank" href="https://twitter.com/share?text=@Html.UrlEncoder.Encode(Model.Board.Title)&url=https://bingo.variel.kr"><i class="fab fa-twitter mr-1"></i> 트위터</a>
+            </div>
+        </div>
+        <a href="@Url.Action("Detail", "Board", new {Model.Board.Id})" class="btn btn-success btn-lg text-white px-5 py-3 my-2"><i class="fa fa-play"></i> 다시 하기</a>
+        <a href="http://127.0.0.1:10000/devstoreaccount1/images/@(Model.Id).png" class="btn btn-secondary btn-lg text-white px-3 py-3 my-2" target="_blank"><i class="fa fa-download"></i> 이미지 다운로드</a>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script></script>
+}

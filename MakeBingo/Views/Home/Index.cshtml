@@ -1,8 +1,26 @@
-﻿@{
+﻿@model Board[]
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <div class="text-center my-5">
+        <h1>나만의 빙고</h1>
+        <h3>이미 만들어진 빙고를 플레이 해보세요</h3>
+    </div>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="card my-2">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Title</h5>
+                        <h6 class="card-subtitle text-muted mb-2">@(String.IsNullOrWhiteSpace(item.Maker) ? "이름없음" : item.Maker)</h6>
+                        <p class="card-text">@(item.Results.Count)명이 이용</p>
+                        <a href="@Url.Action("Detail", "Board", new {item.Id})">빙고 하기 <i class="fa fa-angle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
